@@ -258,6 +258,48 @@ int main(int argc, char *argv[])
     /* Initialize sensors */
     i2c_fd = sensors_init();
 
+
+    /* First part of the project: Hello Server / Hello RPI */
+    // The Raspberry Pi sends a message saying, “Hello Server”. Upon receipt, the server checks and prints the message. If the message matches “Hello Server”, the server must
+    // reply with “Hello RPI”. If the message does not match, the server must reply “Wrong Message”.
+   char hello_msg[] = "Hello Server";
+
+   /* Send "Hello Server" to server */
+   n = sendto(sockfd, hello_msg, strlen(hello_msg), 0,
+           (struct sockaddr *)&serv_addr, serverlen);
+
+   if (n < 0)
+   {
+      error("ERROR sending hello message");
+   }
+
+   printf("Message sent to server: %s\n", hello_msg);
+
+   /* Wait for server reply */
+   bzero(reply_buffer, 256);
+
+   n = recvfrom(sockfd, reply_buffer, 255, 0,
+             (struct sockaddr *)&serv_addr, &serverlen);
+
+   if (n < 0)
+   {
+      error("ERROR receiving server reply");
+   }
+
+   reply_buffer[n] = '\0';
+
+   printf("Server reply: %s\n\n", reply_buffer);
+
+   /* Verify connection */
+   if (strcmp(reply_buffer, "Hello RPI") != 0)
+   {
+      printf("ERROR: Server verification failed\n");
+      close(sockfd);
+      exit(1);
+    }
+
+printf("Connection with server verified successfully\n\n");
+
     while (1)
     {
         for (int i = 0; i < MAX_SAMPLES; i++)

@@ -1,6 +1,6 @@
 LIBS= -lpthread -lm #Libraries used if needed
 SRCS= IOTClient.c 
-BIN=IOTCLient_bin
+BIN=IOTClient_bin
 CFLAGS+= -g -O3
 OBJS=$(subst .cpp,.o,$(SRCS))
 all : $(BIN)
