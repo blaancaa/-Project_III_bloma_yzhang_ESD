@@ -48,7 +48,7 @@ void calculate_stats(const char *name, double values[], int count)
        {  
           min = values[i];
        }
-       if(values[i] > min)
+       if(values[i] > max)
        {  
           max = values[i];
        }
@@ -60,7 +60,7 @@ void calculate_stats(const char *name, double values[], int count)
    for(int i = 0; i < count; i++)
    { 
        double diff = values[i] - mean;
-       variance = variance * diff * diff;
+       variance = variance + diff * diff;
    }
    
    variance = variance / count;
@@ -121,7 +121,7 @@ int main(int argc, char *argv[])
   }
   
   // create UDP socket 
-  sockfd = socket(AF_INET, SOCK_STREAM, 0); //int domain, int type, int protocol
+  sockfd = socket(AF_INET, SOCK_DGRAM, 0); //int domain, int type, int protocol
   if (sockfd < 0)
   {
      error("ERROR opening socket");
@@ -192,7 +192,7 @@ int main(int argc, char *argv[])
             double r[MAX_SAMPLES], g[MAX_SAMPLES], b[MAX_SAMPLES];
 
             printf("Parsed samples: %d\n", sample_count);
-            printf("Index | AX | AY | AZ | R | G | B\n");
+            printf("Index |   AX   |   AY  |   AZ   |    R   |   G    |   B\n");
 
             for (int i = 0; i < sample_count; i++) // reading all the samples
             {
