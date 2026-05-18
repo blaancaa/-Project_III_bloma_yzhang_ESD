@@ -2,13 +2,13 @@ LIBS= -lpthread -lm #Libraries used if needed
 SRCS= IOTClient.c 
 BIN=IOTClient_bin
 CFLAGS+= -g -O3
-OBJS=$(subst .cpp,.o,$(SRCS))
+OBJS=$(SRCS:.c=.o)
 all : $(BIN)
 $(BIN): $(OBJS)	
 	@echo [link] $@
-	$(CXX) -o $@ $(OBJS) $(LDFLAGS) $(LIBS)
-%.o: %.cpp
+	$(CC) -o $@ $(OBJS) $(LDFLAGS) $(LIBS)
+%.o: %.c
 	@echo [Compile] $<
-	$(CXX) -c $(CFLAGS) $< -o $@
+	$(CC) -c $(CFLAGS) $< -o $@
 clean:
 	@rm -f $(OBJS) $(BIN)
