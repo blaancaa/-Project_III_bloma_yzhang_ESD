@@ -218,6 +218,7 @@ int main(int argc, char *argv[])
     char reply_buffer[REPLY_BUFFER_SIZE];
     struct sockaddr_in serv_addr;
     struct hostent *server;
+    char mqtt_cmd[1024];
     SensorSample samples[MAX_SAMPLES];
 
     if (argc < 3)
@@ -290,15 +291,15 @@ int main(int argc, char *argv[])
 
    printf("Server reply: %s\n\n", reply_buffer);
 
-   /* Verify connection */
-   if (strcmp(reply_buffer, "Hello RPI") != 0)
-   {
+    /* Verify connection */
+    if (strcmp(reply_buffer, "Hello RPI") != 0)
+    {
       printf("ERROR: Server verification failed\n");
       close(sockfd);
       exit(1);
     }
 
-printf("Connection with server verified successfully\n\n");
+    printf("Connection with server verified successfully\n\n");
 
     while (1)
     {
@@ -317,6 +318,23 @@ printf("Connection with server verified successfully\n\n");
                    samples[i].r,
                    samples[i].g,
                    samples[i].b);
+
+            //MOSQUITTO CONFIGURATION
+			snprintf(mqtt_cmd, sizeof(mqtt_cmd),
+			"mosquitto_pub -h 192.168.1.168 -p 1883 -t v1/devices/me/telemetry -u \"TOKEN\" "
+			"-m \"{\\\"ax\\\":%.3f,\\\"ay\\\":%.3f,\\\"az\\\":%.3f,\\\"r\\\":%.3f,\\\"g\\\":%.3f,\\\"b\\\":%.3f}\"",
+			samples[i].ax,
+			samples[i].ay,
+			samples[i].az,
+			samples[i].r,
+			samples[i].g,
+			samples[i].b);
+
+			int ret = system(mqtt_cmd);
+			if (ret != 0)
+			{
+				fprintf(stderr, "ERROR: mosquitto_pub failed, code=%d\n", ret);
+			}
 
             sleep(1); // the system take 1 sample in a second
         }
